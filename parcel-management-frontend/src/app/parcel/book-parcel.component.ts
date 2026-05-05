@@ -27,8 +27,8 @@ import { environment } from '../../environments/environment';
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label>City</label>
-                <input type="text" [(ngModel)]="form.pickupCity" name="pickupCity" required />
+                <label>Zip Code</label>
+                <input type="text" [(ngModel)]="form.pickupZipCode" name="pickupZipCode" placeholder="Enter zip code" required />
               </div>
               <div class="form-group">
                 <label>Contact Number</label>
@@ -63,8 +63,8 @@ import { environment } from '../../environments/environment';
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label>City</label>
-                <input type="text" [(ngModel)]="form.dropCity" name="dropCity" required />
+                <label>Zip Code</label>
+                <input type="text" [(ngModel)]="form.dropZipCode" name="dropZipCode" placeholder="Enter zip code" required />
               </div>
               <div class="form-group">
                 <label>Contact Number</label>
@@ -230,10 +230,10 @@ import { environment } from '../../environments/environment';
 export class BookParcelComponent implements OnInit {
   form: any = {
     pickupAddress: '',
-    pickupCity: '',
+    pickupZipCode: '',
     pickupContactInfo: '',
     dropLocation: '',
-    dropCity: '',
+    dropZipCode: '',
     dropContactInfo: '',
     weight: 0,
     pickupDate: ''
@@ -254,22 +254,57 @@ export class BookParcelComponent implements OnInit {
     this.estimatedCost = this.form.weight * 5;
   }
 
-  submitForm() {
-    this.http.post(`${environment.apiUrl}/parcels`, this.form).subscribe({
-      next: (response: any) => {
-        this.message = `✓ Parcel booked! Tracking ID: ${response.trackingId}`;
-        this.messageType = 'success';
-        setTimeout(() => this.router.navigate(['/user/manage-orders']), 2000);
-      },
-      error: () => {
-        this.message = '✗ Failed to book parcel';
-        this.messageType = 'error';
+  validateForm(): boolean {
+    const focusIfError = (id: string, isValid: boolean): boolean => {
+      if (!isValid) {
+        const el = document.getElementById(id);
+        if (el) el.focus();
       }
-    });
+      return isValid;
+    };
+
+    if (!focusIfError('pickupAddress', this.form.pickupAddress?.length > 0 && this.form.pickupAddress.length <= 50)) {
+      this.message = 'Pickup Address is required and max 50 chars';
+      this.messageType = 'error';
+      return false;
+    }
+    if (!focusIfError('pickupZipCode', /^\d{1,6}$/.test(this.form.pickupZipCode))) {
+      this.message = 'Pickup Zip Code must be up to 6 digits';
+      this.messageType = 'error';
+      return false;
+    }
+    if (!focusIfError('pickupContactInfo', /^\d{10}$/.test(this.form.pickupContactInfo))) {
+      this.message = 'Phone must be exactly 10 digits';
+      this.messageType = 'error';
+      return false;
+    }
+    if (!focusIfError('dropLocation', this.form.dropLocation?.length > 0 && this.form.dropLocation.length <= 50)) {
+      this.message = 'Drop Location is required and max 50 chars';
+      this.messageType = 'error';
+      return false;
+    }
+    if (!focusIfError('dropZipCode', /^\d{1,6}$/.test(this.form.dropZipCode))) {
+      this.message = 'Drop Zip Code must be up to 6 digits';
+      this.messageType = 'error';
+      return false;
+    }
+    if (!focusIfError('dropContactInfo', /^\d{10}$/.test(this.form.dropContactInfo))) {
+      this.message = 'Drop Contact Phone must be exactly 10 digits';
+      this.messageType = 'error';
+      return false;
+    }
+    return true;
+  }
+
+  submitForm() {
+    if (!this.validateForm()) return;
+    
+    // Redirect to payment page instead of submitting
+    // We pass form data in state
+    this.router.navigate(['/payment/new'], { state: { parcelData: this.form } });
   }
 
   goBack() {
     this.router.navigate(['/user-dashboard']);
   }
 }
-

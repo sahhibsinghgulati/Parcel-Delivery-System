@@ -1,14 +1,12 @@
 package com.example.parcel.controller;
 
+import com.example.parcel.dto.PaymentDetailRequest;
 import com.example.parcel.dto.PaymentStatusUpdate;
 import com.example.parcel.entity.Payment;
 import com.example.parcel.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +16,23 @@ import java.util.Map;
 public class PaymentController {
     @Autowired
     private PaymentService paymentService;
+
+    @PostMapping("/validate")
+    public ResponseEntity<Map<String, Object>> validatePayment(@RequestBody PaymentDetailRequest request) {
+        try {
+            Payment payment = paymentService.validateAndProcessPayment(request);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("paymentId", payment.getId());
+            response.put("message", "Payment details validated successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
 
     @PostMapping("/update-status")
     public ResponseEntity<Map<String, Object>> updateStatus(@RequestBody PaymentStatusUpdate request) {
@@ -31,5 +46,4 @@ public class PaymentController {
         return ResponseEntity.ok(response);
     }
 }
-
 

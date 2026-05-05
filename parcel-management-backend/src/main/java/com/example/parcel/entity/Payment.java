@@ -2,6 +2,7 @@ package com.example.parcel.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "payments")
 @Data
@@ -20,10 +21,20 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentStatus status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentMethod method;
     private String transactionId;
-    @Column(nullable = false, updatable = false)
+    @Column(updatable = false)
     private LocalDateTime createdAt;
+    @Column
+    private LocalDateTime updatedAt;
+
     public enum PaymentStatus {
         PAYMENT_PENDING, CONFIRMED, PAYMENT_FAILED
+    }
+
+    public enum PaymentMethod {
+        CREDIT_CARD, DEBIT_CARD, UPI
     }
 }

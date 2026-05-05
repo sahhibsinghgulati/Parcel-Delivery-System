@@ -2,6 +2,8 @@ package com.example.parcel.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "parcels")
 @Data
@@ -12,19 +14,40 @@ public class Parcel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true, nullable = false)
+    private String trackingId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", nullable = false)
     private User sender;
     @Column(nullable = false)
-    private String receiver;
+    private String pickupAddress;
+    @Column(nullable = false)
+    private String pickupCity;
+    @Column(nullable = false)
+    private String pickupContactInfo;
+    @Column(nullable = false)
+    private String dropLocation;
+    @Column(nullable = false)
+    private String dropCity;
+    @Column(nullable = false)
+    private String dropContactInfo;
+    @Column(nullable = false)
+    private Double weight;
+    @Column(nullable = false)
+    private Double cost;
+    @Column(nullable = false)
+    private LocalDate pickupDate;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ParcelStatus status;
-    @Column(nullable = false)
-    private Double cost;
-    @Column(nullable = false, updatable = false)
+    @Column
+    private String cancelReason;
+    @Column(updatable = false)
     private LocalDateTime createdAt;
+    @Column
+    private LocalDateTime updatedAt;
+
     public enum ParcelStatus {
-        CREATED, IN_TRANSIT, DELIVERED, CANCELLED
+        CREATED, PENDING, IN_TRANSIT, OUT_FOR_DELIVERY, DELIVERED, CANCELLED
     }
 }

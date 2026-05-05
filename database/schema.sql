@@ -31,3 +31,13 @@ CREATE TABLE parcel_status_history (
     created_at DATETIME NOT NULL,
     CONSTRAINT fk_history_parcel FOREIGN KEY (parcel_id) REFERENCES parcels(id)
 );
+CREATE TABLE feedback (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    parcel_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    rating INT NOT NULL,
+    comment VARCHAR(1000),
+    created_at DATETIME NOT NULL,
+    CONSTRAINT fk_feedback_parcel FOREIGN KEY (parcel_id) REFERENCES parcels(id),
+    CONSTRAINT fk_feedback_user FOREIGN KEY (user_id) REFERENCES users(id)
+);
